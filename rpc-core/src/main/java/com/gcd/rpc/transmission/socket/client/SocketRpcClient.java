@@ -15,12 +15,17 @@ import java.net.Socket;
  */
 @Slf4j
 public class SocketRpcClient implements RpcClient {
-
+    private final String host;
+    private final int port;
+    public SocketRpcClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
 
     @Override
     public RpcResp<?> sendReq(RpcReq req) {
         //通过socket与服务端建立连接
-        try (Socket socket=new Socket("localhost", 8888)) {
+        try (Socket socket=new Socket(host,port)) {
             //讲req数据发送到服务器
             ObjectOutputStream objectOutputStream = new ObjectOutputStream( socket.getOutputStream());
             objectOutputStream.writeObject(req);

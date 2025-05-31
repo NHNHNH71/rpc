@@ -5,15 +5,11 @@ import com.gcd.api.UserService;
 import com.gcd.rpc.dto.RpcReq;
 import com.gcd.rpc.dto.RpcResp;
 import com.gcd.rpc.transmission.RpcClient;
+import com.gcd.rpc.transmission.socket.client.SocketRpcClient;
 
 public class Main {
     public static void main(String[] args) {
-        RpcClient client=new RpcClient() {
-            @Override
-            public RpcResp<?> sendReq(RpcReq req) {
-                return null;
-            }
-        };
+        RpcClient client=new SocketRpcClient("127.0.0.1",8888);
         RpcReq req = RpcReq.builder()
                 .reqId("123")
                 .interfaceName("com.gcd.api.UserService")
@@ -22,7 +18,6 @@ public class Main {
                 .paramTypes(new Class[]{Long.class})
                 .build();
         RpcResp<?> resp = client.sendReq(req);
-        User user=(User)resp.getData();
-        System.out.println(user);
+        System.out.println(resp.getData());
     }
 }
