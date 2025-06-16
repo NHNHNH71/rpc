@@ -6,6 +6,7 @@ import com.gcd.api.UserService;
 public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Long id) {
+        System.out.println("getUser方法被调用");
         return User.builder()
                 .id(id)
                 .name("hello rpc")
