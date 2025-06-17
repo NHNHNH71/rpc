@@ -19,5 +19,17 @@ public class Main {
                 .build();
         RpcResp<?> resp = client.sendReq(req);
         System.out.println(resp.getData());
+
+        client.sendReq(req);
+        client.sendReq(req);
+        client.sendReq(req);
+        client.sendReq(req);
+        client.sendReq(req);
+        client.sendReq(req);
+        client.sendReq(req);
+        client.sendReq(req);
+        client.sendReq(req);
+        client.sendReq(req);
+
     }
 }
