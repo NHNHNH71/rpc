@@ -1,12 +1,16 @@
 package com.gcd.rpc.transmission.socket.server;
 
 import com.gcd.rpc.config.RpcServiceConfig;
+import com.gcd.rpc.constant.RpcConstant;
 import com.gcd.rpc.dto.RpcReq;
 import com.gcd.rpc.dto.RpcResp;
+import com.gcd.rpc.factory.SingletonFactory;
 import com.gcd.rpc.handler.RpcReqHandler;
 import com.gcd.rpc.provider.ServiceProvider;
 import com.gcd.rpc.provider.impl.SimpleServiceProvider;
+import com.gcd.rpc.provider.impl.ZKServiceProvider;
 import com.gcd.rpc.transmission.RpcServer;
+import com.gcd.rpc.transmission.socket.client.SocketRpcClient;
 import com.gcd.rpc.util.ThreadPoolUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +20,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -28,8 +33,11 @@ public class SocketRpcServer implements RpcServer {
     private final ServiceProvider serviceProvider;
     private final RpcReqHandler rpcReqHandler;
     private final ExecutorService executorService;
+    public SocketRpcServer(){
+        this(RpcConstant.SERVER_PORT);
+    }
     public SocketRpcServer(int port) {
-        this(port,new SimpleServiceProvider());
+        this(port, SingletonFactory.getInstance(ZKServiceProvider.class));
     }
     public SocketRpcServer(int port,ServiceProvider serviceProvider) {
         this.port = port;

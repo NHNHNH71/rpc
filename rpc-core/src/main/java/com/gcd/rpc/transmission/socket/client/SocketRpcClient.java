@@ -2,11 +2,15 @@ package com.gcd.rpc.transmission.socket.client;
 
 import com.gcd.rpc.dto.RpcReq;
 import com.gcd.rpc.dto.RpcResp;
+import com.gcd.rpc.factory.SingletonFactory;
+import com.gcd.rpc.registry.ServiceDiscovery;
+import com.gcd.rpc.registry.impl.ZKServiceDiscovery;
 import com.gcd.rpc.transmission.RpcClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -17,17 +21,21 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 public class SocketRpcClient implements RpcClient {
-    private final String host;
-    private final int port;
-    public SocketRpcClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+    private final ServiceDiscovery serviceDiscovery;
+
+    public SocketRpcClient() {
+        this(SingletonFactory.getInstance(ZKServiceDiscovery.class));
+    }
+
+    public SocketRpcClient(ServiceDiscovery serviceDiscovery) {
+        this.serviceDiscovery = serviceDiscovery;
     }
 
     @Override
     public RpcResp<?> sendReq(RpcReq req) {
+        InetSocketAddress  address=serviceDiscovery.lookupService(req);
         //通过socket与服务端建立连接
-        try (Socket socket=new Socket(host,port)) {
+        try (Socket socket=new Socket(address.getAddress(),address.getPort())) {
             //讲req数据发送到服务器
             ObjectOutputStream objectOutputStream = new ObjectOutputStream( socket.getOutputStream());
             objectOutputStream.writeObject(req);

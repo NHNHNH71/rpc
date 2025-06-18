@@ -20,7 +20,7 @@ public class SimpleServiceProvider implements ServiceProvider {
     public void publishService(RpcServiceConfig config) {
         List<String> rpcServiceNames=config.rpcServiceNames();
         if(CollUtil.isEmpty(rpcServiceNames)){
-            throw new RuntimeException("该服务为实现接口");
+            throw new RuntimeException("该服务未实现接口");
         }
         //log.info("成功发布服务:{}"+rpcServiceNames);
         rpcServiceNames.forEach(rpcServiceName-> {
