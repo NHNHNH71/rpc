@@ -11,6 +11,7 @@ import com.gcd.rpc.provider.impl.SimpleServiceProvider;
 import com.gcd.rpc.provider.impl.ZKServiceProvider;
 import com.gcd.rpc.transmission.RpcServer;
 import com.gcd.rpc.transmission.socket.client.SocketRpcClient;
+import com.gcd.rpc.util.ShutdownHookUtils;
 import com.gcd.rpc.util.ThreadPoolUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class SocketRpcServer implements RpcServer {
     }
     @Override
     public void start() {
+        ShutdownHookUtils.addShutdownTask();
         log.info("start socket server");
         try (ServerSocket serverSocket = new ServerSocket(port)){
             log.info("socket创建成功，端口:{}",port);

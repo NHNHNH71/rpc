@@ -36,6 +36,9 @@ public class ZKServiceDiscovery implements ServiceDiscovery {
                 +rpcServiceName;
 
         List<String> children=zkClient.getChildrenNodes(path);
+        children.forEach(s->{
+            log.info("检测到path:{}",s);
+        });
         String address=loadBalance.select(children);
         log.info("找到服务节点path：{}",path+address);
         return IPUtils.toInetSocketAddress(address);

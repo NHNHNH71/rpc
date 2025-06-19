@@ -12,7 +12,6 @@ import java.net.UnknownHostException;
  */
 public class test {
     public static void main(String[] args) throws UnknownHostException {
-        InetSocketAddress address = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), 8888);
-        System.out.println(address.getAddress().getHostAddress());
+        SocketRpcClient socketRpcClient = new SocketRpcClient();
     }
 }
