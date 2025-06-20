@@ -10,4 +10,6 @@ public class RpcConstant {
     public static final int ZK_PORT=2181;
     public static final String ZK_RPC_ROOT_PATH="/felix-rpc";
 
+    public static final String NETTY_RPC_KEY="RpcResp";
+
 }
