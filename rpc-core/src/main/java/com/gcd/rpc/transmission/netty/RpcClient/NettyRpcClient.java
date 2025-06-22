@@ -8,6 +8,8 @@ import com.gcd.rpc.proxy.RpcClientProxy;
 import com.gcd.rpc.registry.ServiceDiscovery;
 import com.gcd.rpc.registry.impl.ZKServiceDiscovery;
 import com.gcd.rpc.transmission.RpcClient;
+import com.gcd.rpc.transmission.netty.codec.NettyRpcDecoder;
+import com.gcd.rpc.transmission.netty.codec.NettyRpcEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -47,8 +49,8 @@ public class NettyRpcClient implements RpcClient {
         bootStrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-                socketChannel.pipeline().addLast(new StringDecoder());
-                socketChannel.pipeline().addLast(new StringEncoder());
+                socketChannel.pipeline().addLast(new NettyRpcDecoder());
+                socketChannel.pipeline().addLast(new NettyRpcEncoder());
                 socketChannel.pipeline().addLast(new NettyClientHandler());
             }
         });
