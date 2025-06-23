@@ -8,6 +8,7 @@ import com.gcd.rpc.serialize.impl.KryoSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,10 +17,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author nhnhnh7171
  * @Date 2025/6/21
  */
+@Slf4j
 public class NettyRpcEncoder extends MessageToByteEncoder<RpcMsg> {
-    private static final AtomicInteger ID_GEN=new AtomicInteger(0);
+
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcMsg msg, ByteBuf out) throws Exception {
+        log.info("进入了encode方法");
         out.writeBytes(RpcConstant.RPC_MAGIC_CODE);
         out.writeByte(msg.getVersion().getCode());
         //消息总长度需要压缩后才能得到 先往右挪动四位预留位置
@@ -27,7 +30,7 @@ public class NettyRpcEncoder extends MessageToByteEncoder<RpcMsg> {
         out.writeByte(msg.getMsgType().getCode());
         out.writeByte(msg.getSerializeType().getCode());
         out.writeByte(msg.getCompressType().getCode());
-        out.writeInt(ID_GEN.getAndIncrement());
+        out.writeInt(msg.getReqId());
         int msgLen=RpcConstant.REQ_HEAD_LEN;
         if(!msg.getMsgType().isHeartbeat()
          &&!Objects.isNull(msg.getData())){

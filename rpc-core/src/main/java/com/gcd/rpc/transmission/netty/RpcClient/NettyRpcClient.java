@@ -1,8 +1,13 @@
 package com.gcd.rpc.transmission.netty.RpcClient;
 
 import com.gcd.rpc.constant.RpcConstant;
+import com.gcd.rpc.dto.RpcMsg;
 import com.gcd.rpc.dto.RpcReq;
 import com.gcd.rpc.dto.RpcResp;
+import com.gcd.rpc.enums.CompressType;
+import com.gcd.rpc.enums.MsgType;
+import com.gcd.rpc.enums.SerializeType;
+import com.gcd.rpc.enums.VersionType;
 import com.gcd.rpc.factory.SingletonFactory;
 import com.gcd.rpc.proxy.RpcClientProxy;
 import com.gcd.rpc.registry.ServiceDiscovery;
@@ -29,6 +34,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author nhnhnh7171
@@ -39,6 +45,7 @@ public class NettyRpcClient implements RpcClient {
     private final ServiceDiscovery serviceDiscovery;
     private static final Bootstrap bootStrap;
     private static final int DEFAULT_CONNECT_TIMEOUT=5000;
+    private static final AtomicInteger ID_GEN=new AtomicInteger(0);
     //对bootStrap进行初始化
     static {
         bootStrap=new Bootstrap();
@@ -67,17 +74,36 @@ public class NettyRpcClient implements RpcClient {
     @Override
     @SneakyThrows
     public RpcResp<?> sendReq(RpcReq req) {
-        //InetSocketAddress address=serviceDiscovery.lookupService(req);
-        ChannelFuture channelFuture=bootStrap.connect(RpcConstant.ZK_IP,RpcConstant.SERVER_PORT)
+        log.info("开始发送请求...");
+        ChannelFuture channelFuture = bootStrap.connect("localhost",RpcConstant.SERVER_PORT)
                 .sync();
-        Channel channel=channelFuture.channel();
-
-        channel.writeAndFlush(req.getInterfaceName()).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+        Channel channel = channelFuture.channel();
+        if (!channel.isActive()) {
+            log.error("Channel 未激活!");
+            return null;
+        }
+        
+        RpcMsg rpcMsg = RpcMsg.builder()
+                .version(VersionType.VERSION1)
+                .serializeType(SerializeType.KRYO)
+                .data(req)
+                .compressType(CompressType.GZIP)
+                .reqId(ID_GEN.incrementAndGet())
+                .msgType(MsgType.RPC_REQ)
+                .build();
+        
+        log.info("准备发送数据: {}", rpcMsg);
+        ChannelFuture writeFuture = channel.writeAndFlush(rpcMsg);
+        writeFuture.addListener(future -> {
+            if (future.isSuccess()) {
+                log.info("消息发送成功");
+            } else {
+                log.error("消息发送失败", future.cause());
+            }
+        });
+        
         channel.closeFuture().sync();
-        //通过channel的一个map获取到服务端的响应内容
-        //在自定义的handler里面将响应内容放到了这个map里面
-        AttributeKey<String> key=AttributeKey.valueOf(RpcConstant.NETTY_RPC_KEY);
-        log.debug("获取响应数据:{}",channel.attr(key).get());
+        log.info("请求完成");
         return null;
     }
     @SneakyThrows

@@ -15,6 +15,7 @@ import com.gcd.rpc.serialize.impl.KryoSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.Objects;
  * @author nhnhnh7171
  * @Date 2025/6/21
  */
+@Slf4j
 public class NettyRpcDecoder extends LengthFieldBasedFrameDecoder {
     public NettyRpcDecoder(){
         super(RpcConstant.REQ_MAX_LEN,5,4,-9,0);
@@ -32,6 +34,7 @@ public class NettyRpcDecoder extends LengthFieldBasedFrameDecoder {
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
         ByteBuf frame=(ByteBuf) super.decode(ctx, in);
+        log.info("进入了decode方法");
         return decodeFrame(frame);
     }
 
@@ -79,7 +82,7 @@ public class NettyRpcDecoder extends LengthFieldBasedFrameDecoder {
     private <T> T readData(ByteBuf byteBuf,int dataLen,Class<T> clazz){
         if(dataLen<=0) return null;
         byte[] data=new byte[dataLen];
-        byteBuf.readBytes(dataLen);
+        byteBuf.readBytes(data);
         GzipCompress compress = SingletonFactory.getInstance(GzipCompress.class);
         data=compress.decompress(data);
         KryoSerializer serializer = SingletonFactory.getInstance(KryoSerializer.class);
