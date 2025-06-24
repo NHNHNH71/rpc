@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -69,7 +70,7 @@ public class NettyRpcClient implements RpcClient {
 
     @Override
     @SneakyThrows
-    public RpcResp<?> sendReq(RpcReq req) {
+    public Future<RpcResp<?>> sendReq(RpcReq req) {
         InetSocketAddress address = serviceDiscovery.lookupService(req);
         log.info("开始发送请求...找到服务端地址：{}",address);
         CompletableFuture<RpcResp<?>> completableFuture=new CompletableFuture<>();
@@ -92,7 +93,7 @@ public class NettyRpcClient implements RpcClient {
                 completableFuture.completeExceptionally(listener.cause());
             }else log.info("发送数据成功");
         });
-        return completableFuture.get();
+        return completableFuture;
     }
     private Channel connect(InetSocketAddress addr){
         try {

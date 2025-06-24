@@ -14,6 +14,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 /**
  * @author nhnhnh7171
@@ -32,7 +34,7 @@ public class SocketRpcClient implements RpcClient {
     }
 
     @Override
-    public RpcResp<?> sendReq(RpcReq req) {
+    public Future<RpcResp<?>> sendReq(RpcReq req) {
         InetSocketAddress  address=serviceDiscovery.lookupService(req);
         //通过socket与服务端建立连接
         try (Socket socket=new Socket(address.getAddress(),address.getPort())) {
@@ -43,7 +45,7 @@ public class SocketRpcClient implements RpcClient {
             //从服务端拿取数据即获取服务端响应
             ObjectInputStream inputStream = new ObjectInputStream( socket.getInputStream());
             Object o = inputStream.readObject();
-            return (RpcResp<?>) o;
+            return CompletableFuture.completedFuture((RpcResp<?>) o);
 
         }catch (Exception e){
             log.error("发送rpc请求失败",e);

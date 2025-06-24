@@ -13,6 +13,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * @author nhnhnh7171
@@ -39,7 +41,7 @@ public class RpcClientProxy implements InvocationHandler {
                 this);
     }
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) {
+    public Object invoke(Object proxy, Method method, Object[] args) throws ExecutionException, InterruptedException {
         System.out.println("方法将要被执行");
         RpcReq req = RpcReq.builder()
                 .reqId(IdUtil.fastSimpleUUID())
@@ -50,10 +52,11 @@ public class RpcClientProxy implements InvocationHandler {
                 .version(config.getVersion())
                 .group(config.getGroup())
                 .build();
-        RpcResp<?> resp = rpcClient.sendReq(req);
-        log.info("方法执行结束,结果：{}",resp);
-        check(req,resp);
-        return resp.getData();
+        Future<RpcResp<?>> future = rpcClient.sendReq(req);
+        RpcResp<?> rpcResp=future.get();
+        log.info("方法执行结束,结果：{}",rpcResp);
+        check(req,rpcResp);
+        return rpcResp.getData();
     }
     private void check(RpcReq req,RpcResp<?> rpcResp){
 
