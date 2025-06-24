@@ -17,9 +17,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * @author nhnhnh7171
@@ -57,6 +55,7 @@ public class NettyRpcDecoder extends LengthFieldBasedFrameDecoder {
 
         int reqId=byteBuf.readInt();
         Object data=readData(byteBuf,msgLen-RpcConstant.REQ_HEAD_LEN,msgType);
+        log.info("decode完成，消息体长度：{}",msgLen-RpcConstant.REQ_HEAD_LEN);
         return RpcMsg.builder()
                 .reqId(reqId)
                 .compressType(compressType)

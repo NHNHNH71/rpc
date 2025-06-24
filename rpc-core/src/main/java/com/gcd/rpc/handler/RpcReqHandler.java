@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author nhnhnh7171
@@ -21,13 +22,20 @@ public class RpcReqHandler {
     }
     //自动try catch并抛出异常，不用自己手动处理异常
     @SneakyThrows
-    public Object invoke(RpcReq rpcReq)  {
-        String rpcServiceName=rpcReq.rpcServiceName();
-        System.out.println(rpcServiceName);
-        Object service= serviceProvider.getService(rpcServiceName);
-        log.info("获取到服务：{}",service.getClass().getCanonicalName());
-        Method method=service.getClass().getMethod(rpcReq.getMethodName(),rpcReq.getParamTypes());
-        log.info("获取到方法，开始反射");
-        return method.invoke(service,rpcReq.getParams());
+    public Object invoke(RpcReq rpcReq) {
+        try {
+            String rpcServiceName = rpcReq.rpcServiceName();
+            System.out.println(rpcServiceName);
+            Object service = serviceProvider.getService(rpcServiceName);
+            log.info("获取到服务：{}", service.getClass().getCanonicalName());
+            Method method = service.getClass().getMethod(rpcReq.getMethodName(), rpcReq.getParamTypes());
+            log.info("获取到方法，开始反射");
+            return method.invoke(service, rpcReq.getParams());
+        } catch (InvocationTargetException e) {
+            // 获取原始异常
+            Throwable targetException = e.getTargetException();
+            log.error("方法调用异常", targetException);
+            throw targetException;
+        }
     }
 }

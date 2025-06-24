@@ -32,6 +32,13 @@ public class RpcResp<T> implements Serializable {
         resp.setReqId(reqId);
         resp.setCode(status.getCode());
         resp.setMsg(status.getMsg());
+        return resp;
+    }
+    public static <T> RpcResp<T> fail(String reqId, String msg) {
+        RpcResp<T> resp=new RpcResp<T>();
+        resp.setReqId(reqId);
+        resp.setCode(RpcRespStatus.FAIL.getCode());
+        resp.setMsg(msg);
 
         return resp;
     }

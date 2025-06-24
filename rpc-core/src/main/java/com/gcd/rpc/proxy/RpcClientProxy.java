@@ -39,7 +39,7 @@ public class RpcClientProxy implements InvocationHandler {
                 this);
     }
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) {
         System.out.println("方法将要被执行");
         RpcReq req = RpcReq.builder()
                 .reqId(IdUtil.fastSimpleUUID())
@@ -51,7 +51,7 @@ public class RpcClientProxy implements InvocationHandler {
                 .group(config.getGroup())
                 .build();
         RpcResp<?> resp = rpcClient.sendReq(req);
-        System.out.println("方法执行结束");
+        log.info("方法执行结束,结果：{}",resp);
         check(req,resp);
         return resp.getData();
     }

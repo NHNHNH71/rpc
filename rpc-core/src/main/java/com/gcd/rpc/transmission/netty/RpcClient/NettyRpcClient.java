@@ -20,20 +20,13 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.AttributeKey;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -55,7 +48,7 @@ public class NettyRpcClient implements RpcClient {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,DEFAULT_CONNECT_TIMEOUT);
         bootStrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(SocketChannel socketChannel) throws Exception {
+            protected void initChannel(SocketChannel socketChannel)  {
                 socketChannel.pipeline().addLast(new NettyRpcDecoder());
                 socketChannel.pipeline().addLast(new NettyRpcEncoder());
                 socketChannel.pipeline().addLast(new NettyClientHandler());
@@ -74,21 +67,21 @@ public class NettyRpcClient implements RpcClient {
     @Override
     @SneakyThrows
     public RpcResp<?> sendReq(RpcReq req) {
-        log.info("开始发送请求...");
-        ChannelFuture channelFuture = bootStrap.connect("localhost",RpcConstant.SERVER_PORT)
-                .sync();
+        InetSocketAddress address = serviceDiscovery.lookupService(req);
+        log.info("开始发送请求...找到服务端地址：{}",address);
+        ChannelFuture channelFuture = bootStrap.connect(address).sync();
         Channel channel = channelFuture.channel();
         if (!channel.isActive()) {
             log.error("Channel 未激活!");
             return null;
         }
-        
+        req.setReqId(String.valueOf(ID_GEN.incrementAndGet()));
         RpcMsg rpcMsg = RpcMsg.builder()
                 .version(VersionType.VERSION1)
                 .serializeType(SerializeType.KRYO)
                 .data(req)
                 .compressType(CompressType.GZIP)
-                .reqId(ID_GEN.incrementAndGet())
+                .reqId(Integer.valueOf(req.getReqId()))
                 .msgType(MsgType.RPC_REQ)
                 .build();
         
@@ -104,11 +97,7 @@ public class NettyRpcClient implements RpcClient {
         
         channel.closeFuture().sync();
         log.info("请求完成");
-        return null;
-    }
-    @SneakyThrows
-    public void connect(){
-        ChannelFuture channelFuture = bootStrap.connect("localhost", 8080).sync();
-
+        AttributeKey<RpcResp<?>> key=AttributeKey.valueOf(RpcConstant.NETTY_RPC_KEY);
+        return channel.attr(key).get();
     }
 }
