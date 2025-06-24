@@ -12,7 +12,9 @@ public class Main {
     public static void main(String[] args) {
         UserService userService= ProxyUtils.getProxy(UserService.class);
         ExecutorService executorService= Executors.newFixedThreadPool(10);
-        for(long i=0;i<10;i++){
+        for(long i=5;i<10;i++){
+//            User u=userService.getUser(i);
+//            log.info("当前线程获取结果:{}",u);
             long finalI = i;
             executorService.execute(()->{
                 User u=userService.getUser(finalI);

@@ -12,6 +12,8 @@ import com.gcd.rpc.provider.ServiceProvider;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -48,6 +50,7 @@ public class NettyRpcServerHandler extends SimpleChannelInboundHandler<RpcMsg> {
                 .serializeType(SerializeType.KRYO)
                 .compressType(CompressType.GZIP)
                 .build();
+        log.info("服务端返回信息:{}",respMsg);
         channelHandlerContext.channel().writeAndFlush(respMsg)
                 .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
 
@@ -66,5 +69,17 @@ public class NettyRpcServerHandler extends SimpleChannelInboundHandler<RpcMsg> {
             log.error("服务端调用方法异常，{}",e.getMessage());
             return RpcResp.fail(rpcReq.getReqId(),e.getMessage());
         }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        boolean needToBeClosed=evt instanceof IdleStateEvent &&((IdleStateEvent)evt).state()==IdleState.READER_IDLE;
+        if(needToBeClosed){
+            log.info("服务端15秒内未收到客户端的消息，关闭channel,addr:{}",ctx.channel().remoteAddress());
+            ctx.channel().close();
+        }else{
+            super.userEventTriggered(ctx, evt);
+        }
+
     }
 }

@@ -18,7 +18,10 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author nhnhnh7171
@@ -54,6 +57,7 @@ public class NettyRpcServer implements RpcServer {
                     .childHandler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
                         protected void initChannel(NioSocketChannel channel){
+                            channel.pipeline().addLast(new IdleStateHandler(10,0,0, TimeUnit.SECONDS));
                             channel.pipeline().addLast(new NettyRpcDecoder());
                             channel.pipeline().addLast(new NettyRpcEncoder());
                             channel.pipeline().addLast(new NettyRpcServerHandler(serviceProvider));

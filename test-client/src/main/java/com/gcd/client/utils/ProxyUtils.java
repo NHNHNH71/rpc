@@ -2,8 +2,7 @@ package com.gcd.client.utils;
 
 import com.gcd.rpc.proxy.RpcClientProxy;
 import com.gcd.rpc.transmission.RpcClient;
-import com.gcd.rpc.transmission.netty.RpcClient.NettyRpcClient;
-import com.gcd.rpc.transmission.socket.client.SocketRpcClient;
+import com.gcd.rpc.transmission.netty.client.NettyRpcClient;
 
 /**
  * @author nhnhnh7171

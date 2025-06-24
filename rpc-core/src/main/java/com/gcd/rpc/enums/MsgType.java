@@ -16,7 +16,7 @@ import java.util.Arrays;
 public enum MsgType {
     HEARTBEAT_REQ((byte) 1,"心跳请求消息"),
 
-    HEARTBEAT_RESP((byte) 1,"心跳响应消息"),
+    HEARTBEAT_RESP((byte) 2,"心跳响应消息"),
 
     RPC_REQ((byte) 3,"rpc请求消息"),
     RPC_RESP((byte) 4,"rpc响应消息");

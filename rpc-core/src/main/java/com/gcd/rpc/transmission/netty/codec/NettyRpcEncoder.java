@@ -11,6 +11,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author nhnhnh7171
@@ -19,9 +20,11 @@ import java.util.Objects;
 @Slf4j
 public class NettyRpcEncoder extends MessageToByteEncoder<RpcMsg> {
 
+    private static final AtomicInteger ID_GEN=new AtomicInteger(0);
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcMsg msg, ByteBuf out){
-        log.info("进入了encode方法");
+        //为消息设置msgId
+        msg.setReqId(ID_GEN.incrementAndGet());
         out.writeBytes(RpcConstant.RPC_MAGIC_CODE);
         out.writeByte(msg.getVersion().getCode());
         //消息总长度需要压缩后才能得到 先往右挪动四位预留位置
@@ -41,7 +44,6 @@ public class NettyRpcEncoder extends MessageToByteEncoder<RpcMsg> {
         out.writerIndex(currIndex-msgLen+RpcConstant.RPC_MAGIC_CODE.length+1);
         out.writeInt(msgLen);
         out.writerIndex(currIndex);
-        log.info("encode完成，消息体长度：{}",msgLen-RpcConstant.REQ_HEAD_LEN);
 
     }
     private byte[] dataToBytes(RpcMsg rpcMsg){
