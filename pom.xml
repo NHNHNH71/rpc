@@ -3,6 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>aliyun</id>
+            <url>https://maven.aliyun.com/repository/central</url>
+        </repository>
+    </repositories>
 
     <groupId>com.gcd</groupId>
     <artifactId>rpc</artifactId>
@@ -22,12 +32,13 @@
         <lombok.version>1.18.32</lombok.version>
         <hutool.version>5.8.9</hutool.version>
         <logback.version>1.3.14</logback.version>
-        <curator.version>5.1.0</curator.version>
+        <curator.version>5.8.0</curator.version>
         <netty.version>4.1.118.Final</netty.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kryo.version>5.4.0</kryo.version>
+        <guava.version>2.0.0</guava.version>
     </properties>
 <!--   外层父项目引入依赖 -->
     <dependencies>
@@ -48,6 +59,11 @@
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-x-discovery</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.rholder</groupId>
+            <artifactId>guava-retrying</artifactId>
+        </dependency>
+
     </dependencies>
 <!--    在父项目中做依赖的统一管理-->
     <dependencyManagement>
@@ -112,6 +128,12 @@
                 <artifactId>objenesis</artifactId>
                 <version>3.3</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.rholder</groupId>
+                <artifactId>guava-retrying</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

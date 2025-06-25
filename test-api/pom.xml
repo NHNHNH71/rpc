@@ -10,6 +10,12 @@
     </parent>
 
     <artifactId>test-api</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.gcd</groupId>
+            <artifactId>rpc-core</artifactId>
+        </dependency>
+    </dependencies>
 
 
 </project>

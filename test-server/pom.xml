@@ -15,10 +15,6 @@
             <groupId>com.gcd</groupId>
             <artifactId>test-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.gcd</groupId>
-            <artifactId>rpc-core</artifactId>
-        </dependency>
     </dependencies>
 
 

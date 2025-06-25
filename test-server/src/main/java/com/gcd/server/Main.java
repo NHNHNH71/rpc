@@ -1,7 +1,7 @@
 package com.gcd.server;
 
 import com.gcd.rpc.config.RpcServiceConfig;
-import com.gcd.rpc.transmission.netty.RpcServcer.NettyRpcServer;
+import com.gcd.rpc.transmission.netty.server.NettyRpcServer;
 import com.gcd.server.Service.UserServiceImpl;
 
 public class Main {
