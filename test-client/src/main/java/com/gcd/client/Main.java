@@ -7,12 +7,20 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 public class Main {
     public static void main(String[] args) {
         UserService userService= ProxyUtils.getProxy(UserService.class);
+        userService.getUser(88L);
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         ExecutorService executorService= Executors.newFixedThreadPool(10);
-        for(long i=7;i<8;i++){
+        for(long i=7;i<11;i++){
 //            User u=userService.getUser(i);
 //            log.info("当前线程获取结果:{}",u);
             long finalI = i;

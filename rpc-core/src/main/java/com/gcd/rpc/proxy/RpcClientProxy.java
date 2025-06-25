@@ -61,7 +61,7 @@ public class RpcClientProxy implements InvocationHandler {
                 .build();
         Retry retry= method.getAnnotation(Retry.class);
         //当目标方法没有retry注解时 直接发送并处理结果
-        if(Objects.isNull(retry)) sendReq(req);
+        if(Objects.isNull(retry)) return sendReq(req);
         //通过retry注解将重试规则注入到retryer中
         Retryer<Object> retryer = RetryerBuilder.newBuilder()
                 //当发生相应异常时重试
