@@ -1,5 +1,7 @@
 package com.gcd.rpc.loadbalance;
 
+import com.gcd.rpc.dto.RpcReq;
+
 import java.util.List;
 
 /**
@@ -7,5 +9,5 @@ import java.util.List;
  * @Date 2025/6/18
  */
 public interface LoadBalance {
-    public String select(List<String> list);
+    public String select(List<String> list, RpcReq rpcReq);
 }

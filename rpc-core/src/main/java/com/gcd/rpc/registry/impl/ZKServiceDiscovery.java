@@ -39,7 +39,7 @@ public class ZKServiceDiscovery implements ServiceDiscovery {
         children.forEach(s->{
             log.info("检测到path:{}",s);
         });
-        String address=loadBalance.select(children);
+        String address=loadBalance.select(children,req);
         log.info("找到服务节点path：{}",path+address);
         return IPUtils.toInetSocketAddress(address);
     }
