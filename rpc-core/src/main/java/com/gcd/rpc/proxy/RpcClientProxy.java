@@ -1,7 +1,10 @@
 package com.gcd.rpc.proxy;
 
 import cn.hutool.core.util.IdUtil;
+import com.gcd.rpc.annotation.Breaker;
 import com.gcd.rpc.annotation.Retry;
+import com.gcd.rpc.breaker.CircuitBreaker;
+import com.gcd.rpc.breaker.CircuitBreakerManager;
 import com.gcd.rpc.config.RpcServiceConfig;
 import com.gcd.rpc.dto.RpcReq;
 import com.gcd.rpc.dto.RpcResp;
@@ -48,7 +51,7 @@ public class RpcClientProxy implements InvocationHandler {
                 this);
     }
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws ExecutionException, RetryException {
+    public Object invoke(Object proxy, Method method, Object[] args) throws Exception {
         System.out.println("方法将要被执行");
         RpcReq req = RpcReq.builder()
                 .reqId(IdUtil.fastSimpleUUID())
@@ -59,6 +62,29 @@ public class RpcClientProxy implements InvocationHandler {
                 .version(config.getVersion())
                 .group(config.getGroup())
                 .build();
+        Breaker breaker=method.getAnnotation(Breaker.class);
+        if(Objects.isNull(breaker)) return sendReqWithRetry(method, req);
+        CircuitBreaker circuitBreaker= CircuitBreakerManager.getCircuitBreaker(
+                req.rpcServiceName(),breaker
+        );
+        log.info("开始判断是否可以发送");
+        if(!circuitBreaker.canSendReq()){
+            log.info("不可以发送");
+            throw new RpcException(req.rpcServiceName()+"服务发生了熔断，请求发送失败");
+        }
+        log.info("可以开始发送");
+        try {
+            Object o= sendReqWithRetry(method,req);
+            circuitBreaker.success();
+            return o;
+        } catch (Exception e) {
+            log.info("捕获到了异常，fail了");
+            circuitBreaker.fail();
+            throw new Exception(e);
+        }
+    }
+
+    private Object sendReqWithRetry(Method method, RpcReq req) throws ExecutionException, RetryException, InterruptedException {
         Retry retry= method.getAnnotation(Retry.class);
         //当目标方法没有retry注解时 直接发送并处理结果
         if(Objects.isNull(retry)) return sendReq(req);
@@ -70,10 +96,11 @@ public class RpcClientProxy implements InvocationHandler {
                 .withStopStrategy(StopStrategies.stopAfterAttempt(retry.maxAttempts()))
                 .withWaitStrategy(WaitStrategies.fixedWait(retry.delay(), TimeUnit.MILLISECONDS))
                 .build();
-        return retryer.call(()->sendReq(req));
+        return retryer.call(() -> sendReq(req));
     }
-    @SneakyThrows
-    private Object sendReq(RpcReq req)  {
+
+
+    private Object sendReq(RpcReq req) throws ExecutionException, InterruptedException {
         Future<RpcResp<?>> future = rpcClient.sendReq(req);
         RpcResp<?> rpcResp=future.get();
         log.info("方法执行结束,结果：{}",rpcResp);

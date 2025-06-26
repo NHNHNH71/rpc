@@ -51,7 +51,7 @@ public class NettyRpcClient implements RpcClient {
         bootStrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel)  {
-                socketChannel.pipeline().addLast(new IdleStateHandler(0,5,0, TimeUnit.SECONDS));
+                //socketChannel.pipeline().addLast(new IdleStateHandler(0,5,0, TimeUnit.SECONDS));
                 socketChannel.pipeline().addLast(new NettyRpcDecoder());
                 socketChannel.pipeline().addLast(new NettyRpcEncoder());
                 socketChannel.pipeline().addLast(new NettyClientHandler());

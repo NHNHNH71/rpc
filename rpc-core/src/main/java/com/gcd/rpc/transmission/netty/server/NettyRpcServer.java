@@ -57,7 +57,7 @@ public class NettyRpcServer implements RpcServer {
                     .childHandler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
                         protected void initChannel(NioSocketChannel channel){
-                            channel.pipeline().addLast(new IdleStateHandler(10,0,0, TimeUnit.SECONDS));
+                           // channel.pipeline().addLast(new IdleStateHandler(10,0,0, TimeUnit.SECONDS));
                             channel.pipeline().addLast(new NettyRpcDecoder());
                             channel.pipeline().addLast(new NettyRpcEncoder());
                             channel.pipeline().addLast(new NettyRpcServerHandler(serviceProvider));

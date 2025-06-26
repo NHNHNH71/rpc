@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private static final AtomicInteger ID_INCREASE=new AtomicInteger();
-    @Limit(requestsPerSecond = 2,timeout = 0)
+    //@Limit(requestsPerSecond = 2,timeout = 0)
     @Override
     public User getUser(Long id) {
         // 根据不同的id抛出不同类型的异常
