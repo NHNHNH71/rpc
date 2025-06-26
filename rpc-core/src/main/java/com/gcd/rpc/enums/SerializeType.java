@@ -14,7 +14,9 @@ import java.util.Arrays;
 @ToString
 @AllArgsConstructor
 public enum SerializeType {
-    KRYO((byte) 1,"kryo");
+    KRYO((byte) 1,"kryo"),
+    HESSIAN((byte) 2,"hessian"),
+    PROTOSTUFF((byte) 3,"protostuff");
     private final byte code;
     private final String desc;
     public static SerializeType getFromByte(byte code){

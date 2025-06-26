@@ -11,30 +11,35 @@
 
     <artifactId>rpc-core</artifactId>
     <dependencies>
+<!--        zk相关依赖-->
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
         </dependency>
+<!--        netty相关依赖-->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>
+<!--        序列化器的依赖-->
+<!--        kryo序列化  针对Java的，只能对Java序列化-->
         <dependency>
             <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
+            <artifactId>kryo-shaded</artifactId>
         </dependency>
-        <!-- Kryo 序列化相关依赖 -->
+<!--        hessian序列化-->
         <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>reflectasm</artifactId>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+        </dependency>
+<!--        protostuff序列化  针对所有语言，兼容性更好-->
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>minlog</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-runtime</artifactId>
         </dependency>
 <!--        重试机制-->
         <dependency>
@@ -46,6 +51,7 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+
     </dependencies>
 
 
