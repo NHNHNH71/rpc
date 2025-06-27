@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 public class Main {
     public static void main(String[] args) {
         UserService userService= ProxyUtils.getProxy(UserService.class);
+//        User u=userService.getUser(8L);
+//        System.out.println(u);
         Scanner sc=new Scanner(System.in);
 
         ExecutorService executorService= Executors.newFixedThreadPool(10);

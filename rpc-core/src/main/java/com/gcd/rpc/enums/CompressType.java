@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author nhnhnh7171
@@ -15,6 +16,7 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum CompressType {
+    CUSTOM((byte) 0,"custom"),
     GZIP((byte) 1,"gzip");
     private final byte code;
     private final String desc;
@@ -22,6 +24,12 @@ public enum CompressType {
         return Arrays.stream(values())
                 .filter(compressType -> compressType.code==code)
                 .findFirst()
-                .orElseThrow(()->new IllegalArgumentException("异常：找不到code对应的压缩类型,code:"+code));
+                .orElse(CUSTOM);
+    }
+    public static CompressType getFromDesc(String desc){
+        return Arrays.stream(values())
+                .filter(compressType -> Objects.equals(compressType.desc, desc))
+                .findFirst()
+                .orElse(CUSTOM);
     }
 }

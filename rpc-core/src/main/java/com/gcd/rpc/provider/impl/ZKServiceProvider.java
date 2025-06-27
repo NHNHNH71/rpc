@@ -8,6 +8,7 @@ import com.gcd.rpc.provider.ServiceProvider;
 import com.gcd.rpc.registry.ServiceDiscovery;
 import com.gcd.rpc.registry.ServiceRegistry;
 import com.gcd.rpc.registry.impl.ZKServiceRegistry;
+import com.gcd.rpc.util.ConfigUtils;
 import lombok.SneakyThrows;
 
 import java.net.InetAddress;
@@ -48,7 +49,7 @@ public class ZKServiceProvider implements ServiceProvider {
     private void publishService(String rpcServiceName,Object service){
 
         String host= InetAddress.getLocalHost().getHostAddress();
-        int port= RpcConstant.SERVER_PORT;
+        int port= ConfigUtils.getRpcConfig().getSERVER_PORT();
         InetSocketAddress address = new InetSocketAddress(host, port);
         serviceRegistry.registerService(rpcServiceName,address);
         SERVICE_CACHE.put(rpcServiceName,service);

@@ -1,5 +1,6 @@
 package com.gcd.rpc.transmission.netty.server;
 
+import com.gcd.rpc.config.RpcConfig;
 import com.gcd.rpc.dto.RpcMsg;
 import com.gcd.rpc.dto.RpcReq;
 import com.gcd.rpc.dto.RpcResp;
@@ -9,6 +10,7 @@ import com.gcd.rpc.enums.SerializeType;
 import com.gcd.rpc.enums.VersionType;
 import com.gcd.rpc.handler.RpcReqHandler;
 import com.gcd.rpc.provider.ServiceProvider;
+import com.gcd.rpc.util.ConfigUtils;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -42,13 +44,14 @@ public class NettyRpcServerHandler extends SimpleChannelInboundHandler<RpcMsg> {
             RpcReq req=(RpcReq) rpcMsg.getData();
             data = handleRpcReq(req);
         }
+        RpcConfig rpcConfig= ConfigUtils.getRpcConfig();
         RpcMsg respMsg = RpcMsg.builder()
                 .reqId(rpcMsg.getReqId())
                 .version(VersionType.VERSION1)
                 .msgType(msgType)
                 .data(data)
-                .serializeType(SerializeType.KRYO)
-                .compressType(CompressType.GZIP)
+                .serializeType(SerializeType.getFromDesc(rpcConfig.getSerializer()))
+                .compressType(CompressType.getFromDesc(rpcConfig.getCompress()))
                 .build();
         log.info("服务端返回信息:{}",respMsg);
         channelHandlerContext.channel().writeAndFlush(respMsg)

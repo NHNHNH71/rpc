@@ -1,5 +1,6 @@
 package com.gcd.rpc.transmission.netty.client;
 
+import com.gcd.rpc.config.RpcConfig;
 import com.gcd.rpc.constant.RpcConstant;
 import com.gcd.rpc.dto.RpcMsg;
 import com.gcd.rpc.dto.RpcResp;
@@ -7,6 +8,7 @@ import com.gcd.rpc.enums.CompressType;
 import com.gcd.rpc.enums.MsgType;
 import com.gcd.rpc.enums.SerializeType;
 import com.gcd.rpc.enums.VersionType;
+import com.gcd.rpc.util.ConfigUtils;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -54,10 +56,11 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMsg> {
             super.userEventTriggered(ctx,evt);
             return ;
         }
+        RpcConfig rpcConfig= ConfigUtils.getRpcConfig();
         RpcMsg rpcMsg = RpcMsg.builder()
                 .version(VersionType.VERSION1)
-                .serializeType(SerializeType.KRYO)
-                .compressType(CompressType.GZIP)
+                .serializeType(SerializeType.getFromDesc(rpcConfig.getSerializer()))
+                .compressType(CompressType.getFromDesc(rpcConfig.getCompress()))
                 .msgType(MsgType.HEARTBEAT_REQ)
                 .build();
         log.info("客户端发送了一个心跳,{}",rpcMsg);

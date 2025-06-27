@@ -38,6 +38,7 @@ public class KryoSerializer implements Serializer {
 
     @Override
     public byte[] serialize(Object object) {
+        log.info("使用了kryo序列化");
         try (ByteArrayOutputStream oos = new ByteArrayOutputStream();
              Output output = new Output(oos)) {
             Kryo kryo = KRYO_THREAD_LOCAL.get();

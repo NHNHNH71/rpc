@@ -8,6 +8,7 @@ import com.gcd.rpc.provider.impl.ZKServiceProvider;
 import com.gcd.rpc.transmission.RpcServer;
 import com.gcd.rpc.transmission.netty.codec.NettyRpcDecoder;
 import com.gcd.rpc.transmission.netty.codec.NettyRpcEncoder;
+import com.gcd.rpc.util.ConfigUtils;
 import com.gcd.rpc.util.ShutdownHookUtils;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -34,7 +35,7 @@ public class NettyRpcServer implements RpcServer {
     private final int port;
 
     public NettyRpcServer() {
-        this(RpcConstant.SERVER_PORT);
+        this(ConfigUtils.getRpcConfig().getSERVER_PORT());
     }
 
     public NettyRpcServer(int port) {

@@ -1,10 +1,15 @@
 package com.gcd.rpc.transmission.netty.codec;
 
+import com.gcd.rpc.compress.Compress;
 import com.gcd.rpc.compress.impl.GzipCompress;
+import com.gcd.rpc.config.RpcConfig;
 import com.gcd.rpc.constant.RpcConstant;
 import com.gcd.rpc.dto.RpcMsg;
 import com.gcd.rpc.factory.SingletonFactory;
+import com.gcd.rpc.serialize.Serializer;
 import com.gcd.rpc.serialize.impl.KryoSerializer;
+import com.gcd.rpc.spi.CustomLoader;
+import com.gcd.rpc.util.ConfigUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -23,9 +28,10 @@ public class NettyRpcEncoder extends MessageToByteEncoder<RpcMsg> {
     private static final AtomicInteger ID_GEN=new AtomicInteger(0);
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcMsg msg, ByteBuf out){
+        RpcConfig rpcConfig = ConfigUtils.getRpcConfig();
         //为消息设置msgId
         msg.setReqId(ID_GEN.incrementAndGet());
-        out.writeBytes(RpcConstant.RPC_MAGIC_CODE);
+        out.writeBytes(rpcConfig.getRPC_MAGIC_CODE());
         out.writeByte(msg.getVersion().getCode());
         //消息总长度需要压缩后才能得到 先往右挪动四位预留位置
         out.writerIndex(out.writerIndex()+4);
@@ -41,16 +47,18 @@ public class NettyRpcEncoder extends MessageToByteEncoder<RpcMsg> {
             msgLen+=data.length;
         }
         int currIndex=out.writerIndex();
-        out.writerIndex(currIndex-msgLen+RpcConstant.RPC_MAGIC_CODE.length+1);
+        out.writerIndex(currIndex-msgLen+rpcConfig.getRPC_MAGIC_CODE().length+1);
         out.writeInt(msgLen);
         out.writerIndex(currIndex);
 
     }
     private byte[] dataToBytes(RpcMsg rpcMsg){
-        // todo 获取序列化和数据压缩的类型再进行选择
-        //先指定序列化和压缩器
-        KryoSerializer serializer = SingletonFactory.getInstance(KryoSerializer.class);
-        GzipCompress compress = SingletonFactory.getInstance(GzipCompress.class);
+        //获取序列化器和压缩工具的加载器
+        CustomLoader<Serializer> serializerCustomLoader = CustomLoader.getLoader(Serializer.class);
+        CustomLoader<Compress> compressCustomLoader = CustomLoader.getLoader(Compress.class);
+        //RpcMsg加载序列化器和压缩工具
+        Serializer serializer = serializerCustomLoader.get(rpcMsg.getSerializeType().getDesc());
+        Compress compress=compressCustomLoader.get(rpcMsg.getCompressType().getDesc());
         byte[] data= serializer.serialize(rpcMsg.getData());
         return compress.compress(data);
     }

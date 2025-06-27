@@ -5,16 +5,19 @@ import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtobufIOUtil;
 import io.protostuff.Schema;
 import io.protostuff.runtime.RuntimeSchema;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author nhnhnh7171
  * @Date 2025/6/26
  */
+@Slf4j
 public class ProtostuffSerializer implements Serializer {
     //分配一个缓冲区 用于存放序列化的数据
     private static final LinkedBuffer BUFFER=LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
     @Override
     public byte[] serialize(Object object) {
+        log.info("使用了protostuff序列化");
         Class<?> clazz=object.getClass();
         Schema schema= RuntimeSchema.getSchema(clazz);
         try {

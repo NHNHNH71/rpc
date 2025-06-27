@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author nhnhnh7171
@@ -14,6 +15,7 @@ import java.util.Arrays;
 @ToString
 @AllArgsConstructor
 public enum SerializeType {
+    CUSTOM((byte) 0,"custom"),
     KRYO((byte) 1,"kryo"),
     HESSIAN((byte) 2,"hessian"),
     PROTOSTUFF((byte) 3,"protostuff");
@@ -23,6 +25,12 @@ public enum SerializeType {
         return Arrays.stream(values())
                 .filter(serializeType -> serializeType.code==code)
                 .findFirst()
-                .orElseThrow(()->new IllegalArgumentException("异常：找不到code对应的序列化器类型,code:"+code));
+                .orElse(CUSTOM);
+    }
+    public static SerializeType getFromDesc(String desc){
+        return Arrays.stream(values())
+                .filter(serializeType -> Objects.equals(serializeType.desc, desc))
+                .findFirst()
+                .orElse(CUSTOM);
     }
 }

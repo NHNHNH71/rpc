@@ -5,6 +5,7 @@ import com.gcd.rpc.constant.RpcConstant;
 import com.gcd.rpc.factory.SingletonFactory;
 import com.gcd.rpc.registry.ServiceRegistry;
 import com.gcd.rpc.registry.zk.ZKClient;
+import com.gcd.rpc.util.ConfigUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +30,7 @@ public class ZKServiceRegistry implements ServiceRegistry {
     public void registerService(String rpcServiceName, InetSocketAddress address) {
         if(Objects.isNull(address)) throw new IllegalArgumentException("address为空");
         log.info("服务注册开始，rpcServiceName: {},address: {}",rpcServiceName,address);
-        String path= RpcConstant.ZK_RPC_ROOT_PATH+StrUtil.SLASH
+        String path= ConfigUtils.getRpcConfig().getZK_RPC_ROOT_PATH()+StrUtil.SLASH
                 +rpcServiceName+StrUtil.SLASH
                 +address.getAddress().getHostAddress()+ StrUtil.COLON+address.getPort();
         log.info("node节点为：{}",path);
@@ -39,7 +40,7 @@ public class ZKServiceRegistry implements ServiceRegistry {
     @Override
     public void clearAll() {
         String host= InetAddress.getLocalHost().getHostAddress();
-        int port=RpcConstant.SERVER_PORT;
+        int port=ConfigUtils.getRpcConfig().getSERVER_PORT();
         zkClient.clearAllService(new InetSocketAddress(host,port));
     }
 }

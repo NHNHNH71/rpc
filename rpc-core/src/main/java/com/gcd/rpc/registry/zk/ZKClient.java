@@ -3,6 +3,7 @@ package com.gcd.rpc.registry.zk;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.StrUtil;
 import com.gcd.rpc.constant.RpcConstant;
+import com.gcd.rpc.util.ConfigUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
@@ -39,7 +40,7 @@ public class ZKClient {
     private final Set<String> SERVICE_ADDRESS_SET= ConcurrentHashMap.newKeySet();
 
     public ZKClient(){
-        this(RpcConstant.ZK_IP,RpcConstant.ZK_PORT);
+        this(ConfigUtils.getRpcConfig().getZK_IP(),ConfigUtils.getRpcConfig().getZK_PORT());
     }
     public ZKClient(String hostname,int port){
         //重试策略

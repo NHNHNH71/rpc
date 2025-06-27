@@ -1,5 +1,6 @@
 package com.gcd.rpc.transmission.netty.client;
 
+import com.gcd.rpc.config.RpcConfig;
 import com.gcd.rpc.constant.RpcConstant;
 import com.gcd.rpc.dto.RpcMsg;
 import com.gcd.rpc.dto.RpcReq;
@@ -14,6 +15,7 @@ import com.gcd.rpc.registry.impl.ZKServiceDiscovery;
 import com.gcd.rpc.transmission.RpcClient;
 import com.gcd.rpc.transmission.netty.codec.NettyRpcDecoder;
 import com.gcd.rpc.transmission.netty.codec.NettyRpcEncoder;
+import com.gcd.rpc.util.ConfigUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -76,12 +78,12 @@ public class NettyRpcClient implements RpcClient {
         CompletableFuture<RpcResp<?>> completableFuture=new CompletableFuture<>();
         CompletableRpcReq.put(req.getReqId(),completableFuture);
         Channel channel = channelPool.get(address,()->connect(address));
+        RpcConfig rpcConfig = ConfigUtils.getRpcConfig();
         RpcMsg rpcMsg = RpcMsg.builder()
                 .version(VersionType.VERSION1)
-                .serializeType(SerializeType.KRYO)
+                .serializeType(SerializeType.getFromDesc(rpcConfig.getSerializer()))
                 .data(req)
-                .compressType(CompressType.GZIP)
-                //.reqId(Integer.valueOf(req.getReqId()))
+                .compressType(CompressType.getFromDesc(rpcConfig.getCompress()))
                 .msgType(MsgType.RPC_REQ)
                 .build();
         

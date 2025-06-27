@@ -8,6 +8,7 @@ import com.gcd.rpc.loadbalance.LoadBalance;
 import com.gcd.rpc.loadbalance.impl.RandomLoadBalance;
 import com.gcd.rpc.registry.ServiceDiscovery;
 import com.gcd.rpc.registry.zk.ZKClient;
+import com.gcd.rpc.util.ConfigUtils;
 import com.gcd.rpc.util.IPUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +33,8 @@ public class ZKServiceDiscovery implements ServiceDiscovery {
     @Override
     public InetSocketAddress lookupService(RpcReq req) {
         String rpcServiceName=req.rpcServiceName();
-        String path= RpcConstant.ZK_RPC_ROOT_PATH+ StrUtil.SLASH
+
+        String path= ConfigUtils.getRpcConfig().getZK_RPC_ROOT_PATH()+ StrUtil.SLASH
                 +rpcServiceName;
 
         List<String> children=zkClient.getChildrenNodes(path);

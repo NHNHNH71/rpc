@@ -11,6 +11,7 @@ import com.gcd.rpc.provider.impl.SimpleServiceProvider;
 import com.gcd.rpc.provider.impl.ZKServiceProvider;
 import com.gcd.rpc.transmission.RpcServer;
 import com.gcd.rpc.transmission.socket.client.SocketRpcClient;
+import com.gcd.rpc.util.ConfigUtils;
 import com.gcd.rpc.util.ShutdownHookUtils;
 import com.gcd.rpc.util.ThreadPoolUtils;
 import lombok.SneakyThrows;
@@ -35,7 +36,7 @@ public class SocketRpcServer implements RpcServer {
     private final RpcReqHandler rpcReqHandler;
     private final ExecutorService executorService;
     public SocketRpcServer(){
-        this(RpcConstant.SERVER_PORT);
+        this(ConfigUtils.getRpcConfig().getSERVER_PORT());
     }
     public SocketRpcServer(int port) {
         this(port, SingletonFactory.getInstance(ZKServiceProvider.class));
